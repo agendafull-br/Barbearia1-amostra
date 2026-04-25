@@ -1345,30 +1345,20 @@
 
         // Inicialização
         (async function init() {
-            document.getElementById('businessName').textContent = CONFIG.BUSINESS_NAME;
-            document.getElementById('adminBusinessName').textContent = CONFIG.BUSINESS_NAME;
-            document.title = `${CONFIG.BUSINESS_NAME} • Sistema de Agendamentos`;
-            try {
-                if ((await safeOp(() => getDocs(query(collection(db, 'services'), limit(1))))).empty) {
-                    await addDoc(collection(db, 'services'), { name: 'Corte Masculino', price: 40, active: true, createdAt: Timestamp.now() });
-                    await addDoc(collection(db, 'services'), { name: 'Barba', price: 30, active: true, createdAt: Timestamp.now() });
-                    await addDoc(collection(db, 'services'), { name: 'Corte + Barba', price: 60, active: true, createdAt: Timestamp.now() });
-                    await addDoc(collection(db, 'services'), { name: 'Pezinho', price: 15, active: true, createdAt: Timestamp.now() });
-                }
-                if (!(await safeOp(() => getDoc(doc(db, 'settings', 'config')))).exists()) {
-                    await setDoc(doc(db, 'settings', 'config'), {
-                        workingDays: { 0: false, 1: true, 2: true, 3: true, 4: true, 5: true, 6: false },
-                        dailyLimit: 10,
-                        businessHours: { open: '09:00', close: '19:00' },
-                        blockedDays: [],
-                        createdAt: Timestamp.now()
-                    });
-                }
-                await loadAppearanceSettings();
-                await loadBlockedDaysSettings();
-            } catch (e) { showToast('Erro de conexão', true); }
-            hideLoader();
-        })();
+    document.getElementById('businessName').textContent = CONFIG.BUSINESS_NAME;
+    document.getElementById('adminBusinessName').textContent = CONFIG.BUSINESS_NAME;
+    document.title = `${CONFIG.BUSINESS_NAME} • Sistema de Agendamentos`;
+
+    // Carrega apenas aparência e bloqueios (leitura pública permitida)
+    try {
+        await loadAppearanceSettings();
+        await loadBlockedDaysSettings();
+    } catch (e) {
+        showToast('Erro de conexão', true);
+    }
+
+    hideLoader();
+})();
 
         // Fechamento de modais
         document.addEventListener('keydown', e => {
